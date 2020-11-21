@@ -1,0 +1,17 @@
+body{
+	background-color:#dae0c5;
+}
+
+.btn-ribbon{
+	display:inline;
+	text-align: center;
+	background-color:gray;
+	border-radius: 2px;
+	vertical-align: middle;
+}
+
+#editor{
+	background-color: white;
+	height:50%;
+	margin-bottom:10px;
+}
