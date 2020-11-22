@@ -15,6 +15,30 @@
 	<link href="style.css" rel="stylesheet"> 
   </head>
 <body>
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="container chapters">
+            <ul>
+                <li> Prologue <i class="fas fa-edit chapters-btn"></i><i class="fas fa-plus chapters-btn"></i></li>
+                <li> Section 1 <i class="fas fa-edit chapters-btn"></i><i class="fas fa-plus chapters-btn"></i></li>
+                <ul>
+                    <li> Chapter 1 <i class="fas fa-edit chapters-btn"></i></li>
+                    <li> Chapter 2 <i class="fas fa-edit chapters-btn"></i></li>
+                </ul>
+                <li> Section 2 <i class="fas fa-edit chapters-btn"></i><i class="fas fa-plus chapters-btn"></i></li>
+                <ul>
+                    <li> Chapter 1 <i class="fas fa-edit chapters-btn"></i></li>
+                    <li> Chapter 2 <i class="fas fa-edit chapters-btn"></i></li>
+                </ul>
+                <li> Epilogue <i class="fas fa-edit chapters-btn"></i><i class="fas fa-plus chapters-btn"></i></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="main">
+        <button class="openbtn" onclick="openNav()">&#9776;</button>
+    </div>
+
     <div class="container" style="padding-top:3%">
     	<div class="row">
     		<div class="col-md-2">
@@ -54,7 +78,24 @@
 </html>
 
 <script>
-  var quill = new Quill('#editor', {
-    theme: 'snow'
-  });
+    var quill = new Quill('#editor', {
+      theme: 'snow'
+    });
+
+      /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
+    function openNav() {
+      $(".openbtn").css("opacity",0);
+      document.getElementById("mySidebar").style.width = "25%";
+      document.getElementById("main").style.marginLeft = "25%";
+      $(".chapters").show()
+    }
+
+    /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
+    function closeNav() {
+      $(".openbtn").css("opacity",1);
+      document.getElementById("mySidebar").style.width = "0";
+      document.getElementById("main").style.marginLeft = "0";
+      $(".chapters").hide() 
+    }
 </script>
+
