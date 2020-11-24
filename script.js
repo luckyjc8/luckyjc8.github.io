@@ -4,11 +4,29 @@ $.wait = function(ms) {
     return defer;
 };
 
-$(".notes-detail").hide()
+$.fn.enterKey = function (fnc) {
+    return this.each(function () {
+        $(this).keypress(function (ev) {
+            var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+            if (keycode == '13') {
+                fnc.call(this, ev);
+            }
+        })
+    })
+}
 
-var quill = new Quill('#editor', {
-  theme: 'snow'
-});
+const reorder = (event, originalArray) => {
+    const movedItem = originalArray.find((item, index) => index === event.oldIndex);
+    const remainingItems = originalArray.filter((item, index) => index !== event.oldIndex);
+  
+    const reorderedItems = [
+        ...remainingItems.slice(0, event.newIndex),
+        movedItem,
+        ...remainingItems.slice(event.newIndex)
+    ];
+  
+    return reorderedItems;
+}
 
   /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
 function openNav() {
@@ -27,56 +45,15 @@ function closeNav() {
     $(".chapters").hide() 
 }
 
-notes = [
-    {
-        title : "Note 1",
-        desc : "",
-        note : "",
-    },
-    {
-       title : "Note 2",
-        desc : "",
-        note : "" ,
-    },
-    {
-        title : "Note 3",
-        desc : "",
-        note : "",
-    }
-]
-
-new Sortable(notelist, {
-    animation: 150,
-    ghostClass: 'sortable-ghost',
-    onEnd: function(evt){
-        notes = reorder(evt,notes)
-        refresh()
-    }
- });
-
-
-
-const reorder = (event, originalArray) => {
-    const movedItem = originalArray.find((item, index) => index === event.oldIndex);
-    const remainingItems = originalArray.filter((item, index) => index !== event.oldIndex);
-  
-    const reorderedItems = [
-        ...remainingItems.slice(0, event.newIndex),
-        movedItem,
-        ...remainingItems.slice(event.newIndex)
-    ];
-  
-    return reorderedItems;
-}
-
-
 function refresh(){
     $("#notes").hide()
     $("#notelist").html("")
     notes.forEach(function(note, i){
         $("#notelist").append(`
             <li>
-                <span class="mid-note" onclick="edit(`+i+`)">`+notes[i].title+`</span>
+                <span class="left-note"><i class="fas fa-bars"></i></span>
+                <span class="mid-note" onclick="doubleclick(this,`+i+`)">`+notes[i].display+`</span>
+                <input class="edit-note edit-note-`+i+`" value="`+notes[i].title+`" style="display:none"/>
                 <span class="right-note" onclick="del(`+i+`)"><i class="fas fa-trash notes-btn"></i></span>
             </li>
         `)
@@ -84,19 +61,33 @@ function refresh(){
     $("#notes").fadeIn()
 }
 
-function add_note(){
-    notes.push({
-        title : "New Note",
-        desc : "",
-        note : ""
-    })
-    refresh()
+function doubleclick(el, i) {
+    if (el.getAttribute("data-dblclick") == null) {
+        el.setAttribute("data-dblclick", 1);
+        setTimeout(function () {
+            if (el.getAttribute("data-dblclick") == 1) {
+                edit(i);
+            }
+            el.removeAttribute("data-dblclick");
+        }, 300);
+    } else {
+        el.removeAttribute("data-dblclick");
+        edit_title(el,i);
+    }
 }
 
-function del(i){
-    notes.splice(i,1)
-    refresh()
+function edit_title(el,i){
+    $(el).hide()
+    $(".edit-note-"+i).show()
+    $(".edit-note-"+i).enterKey(function(){
+        notes[i].title = $(".edit-note-"+i).val();
+        calc_display(notes[i])
+        $(el).show()
+        $(".edit-note-"+i).hide()
+        refresh()
+    })
 }
+
 function edit(i){
     $("#title").val(notes[i].title)
     $("#desc").val(notes[i].desc);
@@ -105,13 +96,27 @@ function edit(i){
     $(".notes").fadeOut(500);
     $.wait(500).then(editNote);
 }
+
 function editNote(){
     $(".notes-detail").fadeIn();
 }
+function calc_display(note){
+    if(note.title.length==0){
+        note.display = "[Untitled]"
+    }
+    else if(note.title.length>20){
+        note.display = note.title.slice(0,limit-3)+"..."
+    }
+    else{
+        note.display = note.title
+    }
+}
 function edited(i){
-    notes[i].title = $("#title").val()
+    limit = 17;
+    notes[i].title = $("#title").val();
     notes[i].desc = $("#desc").val();
     notes[i].note = $("#note").val();
+    calc_display(notes[i]);
     $("#edited").attr("onclick","");
     $(".notes-detail").fadeOut(500);
     $.wait(500).then(editedNote);
@@ -121,10 +126,59 @@ function editedNote(){
     refresh()
 }
 
-function resort(){
-    alert("it works!")
+function del(i){
+    notes.splice(i,1)
+    refresh()
 }
 
 function test(){
-    $("#editor").scrollTop($("#asdf").scrollTop())
+    $(".ql-editor").scrollTop($("#asdf").scrollTop())
+    alert($(".ql-editor").scrollTop()+" | "+$("#asdf").scrollTop())
 }
+
+function add_note(){
+    notes.push({
+        title : "New Note",
+        desc : "",
+        note : "",
+        display : "New Note"
+    })
+    refresh()
+}
+
+$(".notes-detail").hide()
+
+var quill = new Quill('#editor', {
+  theme: 'snow'
+});
+
+notes = [
+    {
+        title : "Note 1",
+        desc : "",
+        note : "",
+        display : "Note 1"
+    },
+    {
+       title : "Note 2",
+        desc : "",
+        note : "" ,
+        display : "Note 2"
+    },
+    {
+        title : "Note 3",
+        desc : "",
+        note : "",
+        display : "Note 3"
+    }
+]
+
+new Sortable(notelist, {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    handle: ".left-note",
+    onEnd: function(evt){
+        notes = reorder(evt,notes)
+        refresh()
+    }
+ });

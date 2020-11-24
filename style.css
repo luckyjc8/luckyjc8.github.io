@@ -95,7 +95,6 @@ body{
   padding-left:10px;
   padding-right:10px;
   margin-top:2px;
-  cursor:move;
 }
 
 #notelist li:hover{
@@ -108,8 +107,19 @@ body{
 	margin-left:20px;
 }
 
+.left-note{
+  float:left;
+  margin-top:6px;
+  cursor:move;
+}
+
 .mid-note{
   cursor:pointer;
+}
+
+.edit-note{
+  width:70%;
+  border-radius:5px;
 }
 
 .right-note{
