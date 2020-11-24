@@ -54,6 +54,7 @@ function refresh(){
                 <span class="left-note"><i class="fas fa-bars"></i></span>
                 <span class="mid-note" onclick="doubleclick(this,`+i+`)">`+notes[i].display+`</span>
                 <input class="edit-note edit-note-`+i+`" value="`+notes[i].title+`" style="display:none"/>
+                <i class="fas fa-check confirm-edit edit-note-`+i+`" style="display:none"></i>
                 <span class="right-note" onclick="del(`+i+`)"><i class="fas fa-trash notes-btn"></i></span>
             </li>
         `)
@@ -80,6 +81,13 @@ function edit_title(el,i){
     $(el).hide()
     $(".edit-note-"+i).show()
     $(".edit-note-"+i).enterKey(function(){
+        notes[i].title = $(".edit-note-"+i).val();
+        calc_display(notes[i])
+        $(el).show()
+        $(".edit-note-"+i).hide()
+        refresh()
+    })
+    $(".confirm-edit").click(function(){
         notes[i].title = $(".edit-note-"+i).val();
         calc_display(notes[i])
         $(el).show()
@@ -127,8 +135,10 @@ function editedNote(){
 }
 
 function del(i){
-    notes.splice(i,1)
-    refresh()
+    if(confirm("Are you sure you want to delete?")){
+        notes.splice(i,1)
+        refresh()
+    }
 }
 
 function test(){
