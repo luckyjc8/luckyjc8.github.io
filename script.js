@@ -44,13 +44,39 @@ notes = [
         note : "",
     }
 ]
+
+new Sortable(notelist, {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    onEnd: function(evt){
+        notes = reorder(evt,notes)
+        refresh()
+    }
+ });
+
+
+
+const reorder = (event, originalArray) => {
+    const movedItem = originalArray.find((item, index) => index === event.oldIndex);
+    const remainingItems = originalArray.filter((item, index) => index !== event.oldIndex);
+  
+    const reorderedItems = [
+        ...remainingItems.slice(0, event.newIndex),
+        movedItem,
+        ...remainingItems.slice(event.newIndex)
+    ];
+  
+    return reorderedItems;
+}
+
+
 function refresh(){
     $("#notes").hide()
-    $("#note-list").html("")
+    $("#notelist").html("")
     notes.forEach(function(note, i){
-        $("#note-list").append(`
-            <li onclick="edit(`+i+`)">
-                <span class="left-note">`+notes[i].title+`</span>
+        $("#notelist").append(`
+            <li>
+                <span class="mid-note" onclick="edit(`+i+`)">`+notes[i].title+`</span>
                 <span class="right-note" onclick="del(`+i+`)"><i class="fas fa-trash notes-btn"></i></span>
             </li>
         `)
@@ -92,4 +118,13 @@ function edited(i){
 }
 function editedNote(){
     $(".notes").fadeIn()
+    refresh()
+}
+
+function resort(){
+    alert("it works!")
+}
+
+function test(){
+    $("#editor").scrollTop($("#asdf").scrollTop())
 }
