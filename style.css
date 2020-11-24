@@ -20,11 +20,11 @@ body{
 .sidebar {
   height: 100%; /* 100% Full-height */
   width: 0; /* 0 width - change this with JavaScript */
+  right: 0;
   position: fixed; /* Stay in place */
   z-index: 1; /* Stay on top */
   top: 0;
-  left: 0;
-  background-color: #111; /* Black*/
+  background-color: #b9bdaa;
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 60px; /* Place content 60px from the top */
   transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
@@ -35,7 +35,7 @@ body{
   padding: 8px 8px 8px 32px;
   text-decoration: none;
   font-size: 25px;
-  color: #818181;
+  color: black;
   display: block;
   transition: 0.3s;
 }
@@ -58,14 +58,11 @@ body{
 .openbtn {
   font-size: 20px;
   cursor: pointer;
-  background-color: #111;
-  color: white;
+  background-color: rgb(0,0,0,0);
+  color: black;
   padding: 10px 15px;
   border: none;
-}
-
-.openbtn:hover {
-  background-color: #444;
+  float:right;
 }
 
 /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
@@ -80,16 +77,41 @@ body{
   .sidebar a {font-size: 18px;}
 }
 
-.chapters{
-	color:white;
+.notes{
+	color:black;
 	font-size: 25px;
 
 }
 
-.chapters ul{
+.notes ul{
 	list-style-type: none;
+  padding-right:20px;
+  padding-left:20px;
 }
 
-.chapters-btn{
+.notes ul li{
+  border-top: 3px solid white;
+  border-bottom: 3px solid white;
+  padding-left:10px;
+  padding-right:10px;
+  margin-top:2px;
+}
+
+.notes ul li:hover{
+  background-color: white;
+  border-top: 3px solid black;
+  border-bottom: 3px solid black;
+}
+
+.notes-btn{
 	margin-left:20px;
+}
+
+.right-note{
+  float:right;
+  margin-top:6px;
+}
+
+form{
+  font-size:18px;
 }
