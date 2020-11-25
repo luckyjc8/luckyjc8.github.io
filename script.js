@@ -156,6 +156,67 @@ function add_note(){
     refresh()
 }
 
+function gen_nav_display(){
+    temp = "<ul>"
+    story.forEach(function(section, i){
+        temp+="<a href='#nav"+i+"'><li>"+section.name+"</li></a>"
+        if(section.chapters && section.chapters.length){
+            temp+="<ul>"
+            section.chapters.forEach(function(chapter,j){
+                temp+="<a href='#nav"+i+j+"'><li>"+chapter.name+"</li></a>"
+                if(chapter.scenes && chapter.scenes.length){
+                    temp+="<ul>"
+                    chapter.scenes.forEach(function(scene,k){
+                        temp+="<a href='#nav"+i+j+k+"'><li>"+scene+"</li>"
+                    })
+                    temp+="</ul>"
+                }
+            })
+            temp+="</ul>"
+        }
+    })
+    temp+="</ul>"
+    $("#side-nav").html(temp)
+    console.log("success")
+}
+
+function gen_nav(){
+    temp = []
+    children = $(".ql-editor").children()
+    i = -1
+    j = -1
+    k = -1
+    for(x=0;x<children.length;x++){
+        tag = $(children[x]).prop("tagName")
+        if(tag == "H1"){
+            i++
+            j=-1
+            k=-1
+            temp.push({
+                name : $(children[x]).html(),
+                chapters : []
+            })
+        }
+        else if(tag == "H2"){
+            j++
+            k=-1
+            temp[i].chapters.push({
+                name : $(children[x]).html(),
+                scenes : []
+            })
+        }
+        else if(tag == "H3"){
+            k++
+            temp[i].chapters[j].scenes.push($(children[x]).html())
+        }
+        if(tag != "P"){
+            $(children[x]).attr("id","nav"+(i==-1?"":i)+(j==-1?"":j)+(k==-1?"":k))
+        }
+    }
+    story = temp
+    gen_nav_display()
+}
+
 $(".notes-detail").hide()
 
 var quill = new Quill('#editor', {
@@ -192,3 +253,12 @@ new Sortable(notelist, {
         refresh()
     }
  });
+
+placeholder = '<h1>Section 1</h1><h2>Chapter 1</h2><h3>Scene 1</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 2</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 3</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h2>Chapter 2</h2><h3>Scene 1</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 2</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 3</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h1>Section 2</h1><h2>Chapter 1</h2><h3>Scene 1</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 2</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 3</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h2>Chapter 2</h2><h3>Scene 1</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 2</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p><h3>Scene 3</h3><p><span style="color: rgb(0, 0, 0);">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla iaculis metus efficitur, viverra felis vitae, porttitor eros. Pellentesque at pretium ante, eget vehicula lorem. Maecenas pharetra nunc nec nulla porttitor porta. Ut rutrum tempor odio, ac accumsan lorem. Fusce at tellus aliquam, convallis neque quis, pulvinar velit. In tincidunt id enim et varius. Mauris et est bibendum, interdum risus nec, malesuada sem. Ut nibh ex, gravida at tristique at, volutpat molestie est. Etiam tempor, nisl eu sollicitudin fermentum, erat lorem condimentum diam, vitae dapibus velit arcu vel odio. Maecenas eu leo ac purus venenatis elementum. Integer tincidunt augue eget blandit luctus.</span></p>'
+
+$(".ql-editor").html(placeholder)
+
+story = []
+window.setInterval(function(){
+    gen_nav()
+},1000);
