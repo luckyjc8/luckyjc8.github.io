@@ -2,6 +2,19 @@ body{
 	background-color:#dae0c5;
 }
 
+.focus{
+  position:fixed;
+  height:100vh;
+  width:100vw;
+  left:0;
+  top:0;
+  background-color: white;
+}
+
+.focus .editor{
+  height:95vh;
+}
+
 .full-height{
   height: 100%
 }
@@ -14,7 +27,7 @@ body{
 	vertical-align: middle;
 }
 
-#editor{
+.editor{
 	background-color: white;
   margin-bottom:20px;
   height:60vh;
@@ -144,13 +157,13 @@ form{
 
 #side-nav ul{
   list-style-type: none;
-  border-bottom:1px solid black;
   margin-bottom:5px;
 }
 
 #side-nav li{
   border-bottom:1px solid black;
   margin-bottom:5px;
+  color:gray;
 }
 
 #side-nav a{
