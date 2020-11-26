@@ -1,5 +1,5 @@
 limit_short = 7
-limit_long = 12
+limit_long = 10
 
 $.wait = function(ms) {
     var defer = $.Deferred();
@@ -68,51 +68,69 @@ function refresh(){
     $("#notelist").html("")
     temp = ""
     notes.forEach(function(note, i){
-        if(note.type == "folder-open"){
-            temp += `
-                <li class="folder-li">
+        temp += `
+            <li class="folder-li" style="background-color:`+notes[i].color+`">
+                <span>
                     <span class="left-note"><i class="fas fa-bars"></i></span>
                     <span class="mid-note" onclick="doubleclick(this,`+i+`,-1)">`+notes[i].display+`</span>
                     <input class="edit-note edit-note-`+i+`-1" value="`+notes[i].title+`" style="display:none"/>
                     <i class="fas fa-check confirm-edit edit-note-`+i+'-1'+`" style="display:none"></i>
-                    <span class="right-note" onclick="toggle_folder(`+i+`)"><i class="fas fa-chevron-up notes-btn"></i></span>
+                    <span class="right-note" onclick="toggle_folder(`+i+`)"><i class="fas fa-chevron-`+ (note.type=='folder-open'?'up':'down') +` notes-btn"></i></span>
                     <span class="right-note" onclick="del(`+i+`,-1)"><i class="fas fa-trash notes-btn"></i></span>
-                
-            `
-            if(note.notes && note.notes.length){
-                temp+="<ul class='"+i+"'>"
-                note.notes.forEach(function(n,j){
-                    temp+=`
-                        <li class="note-li">
-                            <span class="left-note"><i class="fas fa-bars"></i></span>
-                            <span class="mid-note" onclick="doubleclick(this,`+i+`,`+j+`)">`+n.display+`</span>
-                            <input class="edit-note edit-note-`+i+j+`" value="`+n.title+`" style="display:none"/>
-                            <i class="fas fa-check confirm-edit edit-note-`+i+j+`" style="display:none"></i>
-                            <span class="right-note" onclick="del(`+i+`,`+j+`)"><i class="fas fa-trash notes-btn"></i></span>
-                        </li>
-                    `
-                })
-                
-                temp+="</ul></li>"
-            }
+                    <span class="right-note circle" onclick="edit_color(`+i+`)" style="background-color:`+notes[i].color+`;margin-top:8px"></span>
+                </span>
+                <div id="color-`+i+`" class="row" style="display:none">
+                    <div class="col-md-2">
+                        <span class="remove circle" style="background-color:#d0d7dc;margin-top:8px" onclick="recolor('#d0d7dc',`+i+`)"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="circle" style="background-color:#9ac1ea;margin-top:8px" onclick="recolor('#9ac1ea',`+i+`)"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="circle" style="background-color:#a2e9a0;margin-top:8px" onclick="recolor('#a2e9a0',`+i+`)"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="circle" style="background-color:#f6df79;margin-top:8px" onclick="recolor('#f6df79',`+i+`)"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="circle" style="background-color:#d8b5fd;margin-top:8px" onclick="recolor('#d8b5fd',`+i+`)"></span>
+                    </div>
+                    <div class="col-md-2">
+                        <span class="circle" style="background-color:#ceb292;margin-top:8px" onclick="recolor('#ceb292',`+i+`)"></span>
+                    </div>
+                </div>
+            
+        `
+        if(note.type=="folder-open" && note.notes && note.notes.length){
+            temp+="<ul class='"+i+"'>"
+            note.notes.forEach(function(n,j){
+                temp+=`
+                    <li class="note-li">
+                        <span class="left-note"><i class="fas fa-bars"></i></span>
+                        <span class="mid-note" onclick="doubleclick(this,`+i+`,`+j+`)">`+n.display+`</span>
+                        <input class="edit-note edit-note-`+i+j+`" value="`+n.title+`" style="display:none"/>
+                        <i class="fas fa-check confirm-edit edit-note-`+i+j+`" style="display:none"></i>
+                        <span class="right-note" onclick="del(`+i+`,`+j+`)"><i class="fas fa-trash notes-btn"></i></span>
+                    </li>
+                `
+            })
+            
+            temp+="</ul></li>"
+        }
 
-        }
-        else if(note.type == "folder-close"){
-            temp += `
-                <li class="folder-li">
-                    <span class="left-note"><i class="fas fa-bars"></i></span>
-                    <span class="mid-note" onclick="doubleclick(this,`+i+`,-1)">`+notes[i].display+`</span>
-                    <input class="edit-note edit-note-`+i+`-1" value="`+notes[i].title+`" style="display:none"/>
-                    <i class="fas fa-check confirm-edit edit-note-`+i+'-1'+`" style="display:none"></i>
-                    <span class="right-note" onclick="toggle_folder(`+i+`)"><i class="fas fa-chevron-down notes-btn"></i></span>
-                    <span class="right-note" onclick="del(`+i+`,-1)"><i class="fas fa-trash notes-btn"></i></span>
-                </li>
-            `
-        }
     })
     $("#notelist").append(temp)
     applySortable()
     $("#notes").fadeIn()
+}
+
+function edit_color(i){
+    $("#color-"+i).show()
+}
+
+function recolor(color,i){
+    notes[i].color = color
+    refresh()
 }
 
 function applySortable(){
@@ -381,6 +399,7 @@ notes = [
         title : "Category 1",
         display : "Category 1",
         type : "folder-open",
+        color : "#b9bdaa",
         notes: [
             {
                title : "Note 1",
@@ -402,6 +421,7 @@ notes = [
         title : "Category 2",
         display : "Category 2",
         type : "folder-open",
+        color:"#b9bdaa",
         notes: [
             {
                title : "Note 3",
@@ -442,3 +462,23 @@ story = []
 window.setInterval(function(){
     gen_nav()
 },1000);
+
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function drop_down_templates() {
+    document.getElementById("templates").classList.toggle("show");
+}
+
+// Close the dropdown menu if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn') && !event.target.matches('.dropicon')) {
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
