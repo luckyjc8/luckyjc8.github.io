@@ -1,3 +1,6 @@
+limit_short = 7
+limit_long = 12
+
 $.wait = function(ms) {
     var defer = $.Deferred();
     setTimeout(function() { defer.resolve(); }, ms);
@@ -45,62 +48,151 @@ function closeNav() {
     $(".chapters").hide() 
 }
 
+function toggle_folder(i){
+    notes[i].type = notes[i].type == "folder-open" ? "folder-close" : "folder-open"
+    refresh()
+}
+
+function rearrange_note(evt){
+    i1 = evt.from.classList.item(0)
+    i2 = evt.to.classList.item(0)
+    j1 = evt.oldIndex
+    j2 = evt.newIndex
+    console.log(i1+" "+i2+" "+j1+" "+j2)
+    notes[i2].notes.splice(j2,0,notes[i1].notes[j1])
+    notes[i1].notes.splice(j1,1)
+}
+
 function refresh(){
     $("#notes").hide()
     $("#notelist").html("")
+    temp = ""
     notes.forEach(function(note, i){
-        $("#notelist").append(`
-            <li>
-                <span class="left-note"><i class="fas fa-bars"></i></span>
-                <span class="mid-note" onclick="doubleclick(this,`+i+`)">`+notes[i].display+`</span>
-                <input class="edit-note edit-note-`+i+`" value="`+notes[i].title+`" style="display:none"/>
-                <i class="fas fa-check confirm-edit edit-note-`+i+`" style="display:none"></i>
-                <span class="right-note" onclick="del(`+i+`)"><i class="fas fa-trash notes-btn"></i></span>
-            </li>
-        `)
+        if(note.type == "folder-open"){
+            temp += `
+                <li class="folder-li">
+                    <span class="left-note"><i class="fas fa-bars"></i></span>
+                    <span class="mid-note" onclick="doubleclick(this,`+i+`,-1)">`+notes[i].display+`</span>
+                    <input class="edit-note edit-note-`+i+`-1" value="`+notes[i].title+`" style="display:none"/>
+                    <i class="fas fa-check confirm-edit edit-note-`+i+'-1'+`" style="display:none"></i>
+                    <span class="right-note" onclick="toggle_folder(`+i+`)"><i class="fas fa-chevron-up notes-btn"></i></span>
+                    <span class="right-note" onclick="del(`+i+`,-1)"><i class="fas fa-trash notes-btn"></i></span>
+                
+            `
+            if(note.notes && note.notes.length){
+                temp+="<ul class='"+i+"'>"
+                note.notes.forEach(function(n,j){
+                    temp+=`
+                        <li class="note-li">
+                            <span class="left-note"><i class="fas fa-bars"></i></span>
+                            <span class="mid-note" onclick="doubleclick(this,`+i+`,`+j+`)">`+n.display+`</span>
+                            <input class="edit-note edit-note-`+i+j+`" value="`+n.title+`" style="display:none"/>
+                            <i class="fas fa-check confirm-edit edit-note-`+i+j+`" style="display:none"></i>
+                            <span class="right-note" onclick="del(`+i+`,`+j+`)"><i class="fas fa-trash notes-btn"></i></span>
+                        </li>
+                    `
+                })
+                
+                temp+="</ul></li>"
+            }
+
+        }
+        else if(note.type == "folder-close"){
+            temp += `
+                <li class="folder-li">
+                    <span class="left-note"><i class="fas fa-bars"></i></span>
+                    <span class="mid-note" onclick="doubleclick(this,`+i+`,-1)">`+notes[i].display+`</span>
+                    <input class="edit-note edit-note-`+i+`-1" value="`+notes[i].title+`" style="display:none"/>
+                    <i class="fas fa-check confirm-edit edit-note-`+i+'-1'+`" style="display:none"></i>
+                    <span class="right-note" onclick="toggle_folder(`+i+`)"><i class="fas fa-chevron-down notes-btn"></i></span>
+                    <span class="right-note" onclick="del(`+i+`,-1)"><i class="fas fa-trash notes-btn"></i></span>
+                </li>
+            `
+        }
     })
+    $("#notelist").append(temp)
+    applySortable()
     $("#notes").fadeIn()
 }
 
-function doubleclick(el, i) {
+function applySortable(){
+    sortable_option = {
+        group: {
+            name: "sortable-child",
+            pull: true,
+            put: true,
+        },
+        animation: 250,
+        forceFallback: true,
+        onEnd:function(evt){
+            rearrange_note(evt)
+            refresh()
+        }
+    }
+    notelist_children = $("#notelist").children()
+    for(i=0;i<notelist_children.length;i++){
+        new_sortable = $(notelist_children[i]).find("ul")[0]
+        if(new_sortable){
+            new Sortable(new_sortable,sortable_option)
+        }
+    }
+}
+
+function doubleclick(el,i,j) {
     if (el.getAttribute("data-dblclick") == null) {
         el.setAttribute("data-dblclick", 1);
         setTimeout(function () {
             if (el.getAttribute("data-dblclick") == 1) {
-                edit(i);
+                if(j!=-1){
+                    edit(i,j);
+                }   
             }
             el.removeAttribute("data-dblclick");
         }, 300);
     } else {
         el.removeAttribute("data-dblclick");
-        edit_title(el,i);
+        edit_title(el,i,j);
     }
 }
 
-function edit_title(el,i){
+function edit_title(el,i,j){
     $(el).hide()
-    $(".edit-note-"+i).show()
-    $(".edit-note-"+i).enterKey(function(){
-        notes[i].title = $(".edit-note-"+i).val();
-        calc_display(notes[i])
+    $(".edit-note-"+i+j).show()
+    $(".edit-note-"+i+j).enterKey(function(){
+        if(j==-1){
+            notes[i].title = $(".edit-note-"+i+""+j).val();
+            calc_display(notes[i],12)
+        }
+        else{
+            notes[i].notes[j].title = $(".edit-note-"+i+""+j).val();
+            calc_display(notes[i].notes[j],8)
+            
+        }
+        $(".edit-note-"+i+""+j).hide()
         $(el).show()
-        $(".edit-note-"+i).hide()
         refresh()
     })
     $(".confirm-edit").click(function(){
-        notes[i].title = $(".edit-note-"+i).val();
-        calc_display(notes[i])
+        if(j==-1){
+            notes[i].title = $(".edit-note-"+i+""+j).val();
+            calc_display(notes[i],limit_long)
+        }
+        else{
+            notes[i].notes[j].title = $(".edit-note-"+i+""+j).val();
+            calc_display(notes[i].notes[j],limit_short)
+            
+        }
+        $(".edit-note-"+i+""+j).hide()
         $(el).show()
-        $(".edit-note-"+i).hide()
         refresh()
     })
 }
 
-function edit(i){
-    $("#title").val(notes[i].title)
-    $("#desc").val(notes[i].desc);
-    $("#note").val(notes[i].note);
-    $("#edited").attr("onclick","edited("+i+")");
+function edit(i,j){
+    $("#title").val(notes[i].notes[j].title)
+    $("#desc").val(notes[i].notes[j].desc);
+    $("#note").val(notes[i].notes[j].note);
+    $("#edited").attr("onclick","edited("+i+","+j+")");
     $(".notes").fadeOut(500);
     $.wait(500).then(editNote);
 }
@@ -108,7 +200,7 @@ function edit(i){
 function editNote(){
     $(".notes-detail").fadeIn();
 }
-function calc_display(note){
+function calc_display(note,limit=8){
     if(note.title.length==0){
         note.display = "[Untitled]"
     }
@@ -119,12 +211,11 @@ function calc_display(note){
         note.display = note.title
     }
 }
-function edited(i){
-    limit = 17;
-    notes[i].title = $("#title").val();
-    notes[i].desc = $("#desc").val();
-    notes[i].note = $("#note").val();
-    calc_display(notes[i]);
+function edited(i,j){
+    notes[i].notes[j].title = $("#title").val();
+    notes[i].notes[j].desc = $("#desc").val();
+    notes[i].notes[j].note = $("#note").val();
+    calc_display(notes[i].notes[j],limit_short);
     $("#edited").attr("onclick","");
     $(".notes-detail").fadeOut(500);
     $.wait(500).then(editedNote);
@@ -134,24 +225,60 @@ function editedNote(){
     refresh()
 }
 
-function del(i){
-    if(confirm("Are you sure you want to delete?")){
-        notes.splice(i,1)
-        refresh()
+function del(i,j){
+    if(j!=-1){
+        if(confirm("Are you sure you want to delete?")){
+            notes[i].notes.splice(j,1)
+            refresh()
+        }
     }
-}
-
-function test(){
-    $(".ql-editor").scrollTop($("#asdf").scrollTop())
-    alert($(".ql-editor").scrollTop()+" | "+$("#asdf").scrollTop())
+    else{
+        if(confirm("Are you sure you want to delete?")){
+            if(confirm("Warning : This will delete all notes inside this category!")){
+                notes.splice(i,1)
+                refresh()
+            }
+        }
+    }
+    
 }
 
 function add_note(){
+    if(notes == [] || notes.length==0){
+        notes.push({
+            title : "New Category",
+            display : "New Category",
+            type : "folder-open",
+            notes : [
+                {
+                    title : "New Note",
+                    desc : "",
+                    note : "",
+                    display : "New Note",
+                    type : "note"
+                }
+            ]
+        })
+    }
+    else{
+        notes[notes.length-1].notes.push({
+            title : "New Note",
+            desc : "",
+            note : "",
+            display : "New Note",
+            type : "note"
+        })
+    }
+    
+    refresh()
+}
+
+function add_category(){
     notes.push({
-        title : "New Note",
-        desc : "",
-        note : "",
-        display : "New Note"
+        title : "New Category",
+        display : "New Category",
+        type : "folder-open",
+        notes : []
     })
     refresh()
 }
@@ -240,7 +367,6 @@ function gen_nav(){
         }
     }
     story = temp
-    console.log(temp)
     gen_nav_display()
 }
 
@@ -252,22 +378,46 @@ var quill = new Quill('#editor', {
 
 notes = [
     {
-        title : "Note 1",
-        desc : "",
-        note : "",
-        display : "Note 1"
+        title : "Category 1",
+        display : "Category 1",
+        type : "folder-open",
+        notes: [
+            {
+               title : "Note 1",
+                desc : "",
+                note : "" ,
+                display : "Note 1",
+                type : "note"
+            },
+            {
+                title : "Note 2",
+                desc : "",
+                note : "",
+                display : "Note 2",
+                type : "note"
+            }
+        ]
     },
     {
-       title : "Note 2",
-        desc : "",
-        note : "" ,
-        display : "Note 2"
-    },
-    {
-        title : "Note 3",
-        desc : "",
-        note : "",
-        display : "Note 3"
+        title : "Category 2",
+        display : "Category 2",
+        type : "folder-open",
+        notes: [
+            {
+               title : "Note 3",
+                desc : "",
+                note : "" ,
+                display : "Note 3",
+                type : "note"
+            },
+            {
+                title : "Note 4",
+                desc : "",
+                note : "",
+                display : "Note 4",
+                type : "note"
+            }
+        ]
     }
 ]
 
