@@ -101,23 +101,22 @@ function refresh(){
                 </div>
             
         `
+        temp+="<ul class='"+i+"'>"
         if(note.type=="folder-open" && note.notes && note.notes.length){
-            temp+="<ul class='"+i+"'>"
             note.notes.forEach(function(n,j){
                 temp+=`
                     <li class="note-li">
                         <span class="left-note"><i class="fas fa-bars"></i></span>
-                        <span class="mid-note" onclick="doubleclick(this,`+i+`,`+j+`)">`+n.display+`</span>
-                        <input class="edit-note edit-note-`+i+j+`" value="`+n.title+`" style="display:none"/>
+                        <span class="mid-note nt-`+i+''+j+`" onclick="doubleclick(this,`+i+`,`+j+`)">`+n.display+`</span>
+                        <input class="edit-note edit-note-`+i+''+j+`" value="`+n.title+`" style="display:none"/>
                         <i class="fas fa-check confirm-edit edit-note-`+i+j+`" style="display:none"></i>
                         <span class="right-note" onclick="del(`+i+`,`+j+`)"><i class="fas fa-trash notes-btn"></i></span>
                     </li>
                 `
             })
             
-            temp+="</ul></li>"
         }
-
+        temp+="</ul></li>"
     })
     $("#notelist").append(temp)
     applySortable()
@@ -150,9 +149,7 @@ function applySortable(){
     notelist_children = $("#notelist").children()
     for(i=0;i<notelist_children.length;i++){
         new_sortable = $(notelist_children[i]).find("ul")[0]
-        if(new_sortable){
-            new Sortable(new_sortable,sortable_option)
-        }
+        new Sortable(new_sortable,sortable_option)
     }
 }
 
@@ -277,18 +274,20 @@ function add_note(){
                 }
             ]
         })
+        refresh()
+        edit_title($(".nt-00").get(0),0,0)
     }
     else{
-        notes[notes.length-1].notes.push({
+        notes[0].notes.push({
             title : "New Note",
             desc : "",
             note : "",
             display : "New Note",
             type : "note"
         })
+        refresh()
+        edit_title($(".nt-0"+(notes[0].notes.length-1)).get(0),0,notes[0].notes.length-1)
     }
-    
-    refresh()
 }
 
 function add_category(){
